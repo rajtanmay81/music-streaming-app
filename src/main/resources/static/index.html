@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Music Streaming App</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎵 Music Streaming App</h1>
+
+  <!-- AUTH -->
+  <div id="auth">
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- APP -->
+  <div id="app" style="display:none;">
+    <h3>All Songs</h3>
+    <ul id="songs"></ul>
+
+    <h3>My Playlist</h3>
+    <ul id="playlist"></ul>
+
+    <audio id="player" controls></audio>
+  </div>
+
+</div>
+
+<script>
+  let token = null;
+  const songsUl = document.getElementById("songs");
+  const playlistUl = document.getElementById("playlist");
+  const player = document.getElementById("player");
+
+  function register() {
+    fetch("/auth/register", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value
+      })
+    }).then(() => alert("Registered. Now login."));
+  }
+
+  function login() {
+    fetch("/auth/login", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value
+      })
+    })
+            .then(r => r.json())
+            .then(d => {
+              token = d.token;
+              auth.style.display = "none";
+              app.style.display = "block";
+              loadSongs();
+              loadPlaylist();
+            });
+  }
+
+  function loadSongs() {
+    fetch("/songs")
+            .then(r => r.json())
+            .then(data => {
+              songsUl.innerHTML = "";
+              data.forEach(s => {
+                const li = document.createElement("li");
+                li.innerHTML = s.title +
+                        ' <button onclick="addToPlaylist(' + s.id + ')">Add</button>';
+                li.onclick = () => play(s.id);
+                songsUl.appendChild(li);
+              });
+            });
+  }
+
+  function loadPlaylist() {
+    fetch("/playlists/1", {
+      headers: {"Authorization":"Bearer " + token}
+    })
+            .then(r => r.json())
+            .then(p => {
+              playlistUl.innerHTML = "";
+              p.songs.forEach(s => {
+                const li = document.createElement("li");
+                li.innerText = s.title;
+                li.onclick = () => play(s.id);
+                playlistUl.appendChild(li);
+              });
+            });
+  }
+
+  function addToPlaylist(songId) {
+    fetch("/playlists/1/songs/" + songId, {
+      method:"POST",
+      headers: {"Authorization":"Bearer " + token}
+    }).then(loadPlaylist);
+  }
+
+  function play(id) {
+    player.src = "/songs/" + id + "/stream";
+    player.play();
+  }
+</script>
+
+</body>
+</html>

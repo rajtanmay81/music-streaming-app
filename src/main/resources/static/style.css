@@ -1,0 +1,46 @@
+body {
+    background:#121212;
+    color:white;
+    font-family:Arial;
+}
+
+.container {
+    width:420px;
+    margin:40px auto;
+    background:#1e1e1e;
+    padding:20px;
+    border-radius:8px;
+}
+
+input {
+    width:90%;
+    padding:8px;
+    margin-bottom:8px;
+}
+
+button {
+    background:#1db954;
+    border:none;
+    padding:6px 10px;
+    margin-left:5px;
+    cursor:pointer;
+    border-radius:4px;
+}
+
+ul {
+    list-style:none;
+    padding:0;
+}
+
+li {
+    background:#2a2a2a;
+    padding:8px;
+    margin-bottom:6px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+audio {
+    width:100%;
+    margin-top:15px;
+}
